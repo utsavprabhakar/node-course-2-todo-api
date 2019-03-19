@@ -7,6 +7,7 @@ var {Todo} = require('/home/prabhakar/Desktop/node-todo-api/models/todo.js');
 var {user} = require('/home/prabhakar/Desktop/node-todo-api/models/user.js');
 
 app.use(bodyParser.json());
+
 app.post('/todos', function(req,res){
   console.log(req.body);
   var newtodo = new Todo({
@@ -18,6 +19,17 @@ app.post('/todos', function(req,res){
     res.status(400).send(e);
 
   })
+})
+
+app.get('/todos', (req, res)=>{
+  Todo.find({}).then((todos)=>{
+    res.send({
+      todos: todos
+    });
+  }, (e)=>{
+    res.status(400).send(e);
+
+  });
 })
 app.listen(3000, ()=>{
   console.log('Process started at port 3000');
