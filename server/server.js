@@ -95,6 +95,19 @@ app.get('/todos/:id', (req, res)=>{
     })
 });
 
+app.delete('/todos/:id', (req, res)=>{
+  var id = req.params.id;
+  if(!ObjectId.isValid(id)){
+    res.status(404).send();
+  }
+  Todo.findByIdAndDelete(id).then((todo)=>{
+    res.status(200).send({todo});
+  }).catch((e)=>{
+    res.status(400).send();
+
+  })
+})
+
 app.get('/users', (req, res)=>{
   User.find({}).then((users)=>{
     res.send({
@@ -105,9 +118,7 @@ app.get('/users', (req, res)=>{
   })
 });
 
-// app.post('/users', (req, res)=>{
-//   User.
-// })
+
 app.listen(port, ()=>{
   console.log(`process started at port ${port}`);
 })
