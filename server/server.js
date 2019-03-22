@@ -7,6 +7,7 @@ var {mongoose}= require('./db/mongoose.js');
 var {Todo} = require('./../models/todo.js');
 var {User} = require('./../models/user.js');
 
+const port = process.env.PORT || 3000 ;
 app.use(bodyParser.json());
 
 // var Todo = mongoose.model('Todo', {
@@ -107,6 +108,6 @@ app.get('/users', (req, res)=>{
 // app.post('/users', (req, res)=>{
 //   User.
 // })
-app.listen(3000, ()=>{
-  console.log('Process started at port 3000');
+app.listen(port, ()=>{
+  console.log(`process started at port ${port}`);
 })
