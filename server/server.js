@@ -10,6 +10,8 @@ var {User} = require('./../models/user.js');
 
 const port = process.env.PORT || 3000 ;
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended:true}));
+
 
 // var Todo = mongoose.model('Todo', {
 //   text: {
@@ -142,6 +144,21 @@ app.get('/users', (req, res)=>{
     res.status(400).send(e);
   })
 });
+
+app.post('/users', (req,res)=>{
+  var body = _.pick(req.body, ["email", "password"]);
+  var newUser = new User(body);
+  newUser.save().then(()=>{
+    //console.log('amen1')
+    return newUser.generateAuthToken();
+  }).then((token)=>{
+    //console.log("amen2");
+    res.header('x-auth', token).send(newUser);
+  }).catch((e)=>{
+    //console.log('amen3');
+    res.status(400).send(e);
+  })
+})
 
 
 app.listen(port, ()=>{
