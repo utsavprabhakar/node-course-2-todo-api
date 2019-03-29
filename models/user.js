@@ -41,6 +41,7 @@ userSchema.methods.toJSON = function(){
 }
 
 userSchema.methods.generateAuthToken = function(){
+    //console.log(1);
     var user = this;
     var access = 'auth';
     var token =jwt.sign({
@@ -55,6 +56,30 @@ userSchema.methods.generateAuthToken = function(){
         return token;
     });
 
+}
+
+userSchema.statics.findByToken = function(token){
+    var User = this //capital  U because model method.
+    var decoded;  // why left undefined?this will store the return result from jwt.verify
+    // we do this because jwt.verify will throw an error if something goes wrong.
+    //we want to catch the error if that happens. 
+    // we achieve this by using try catch .
+    try{
+        decoded = jwt.verify(token, 'abc123')
+    } catch(e){
+        return new Promise((resolve, reject)=>{  //what this does is returns a promise that always reject.
+            reject();                            //this promse will be returned by findByToken()
+                                                 //then over in server.js, it will be rejected so our then block wont be executed.       
+        })
+     // return Promise.reject(); or do this. same thing. just easier. wecan ever pass arguments for e in catch in server.
+
+    }
+    //success. verify worked. no error.
+    return User.findOne({
+        '_id' : decoded._id,
+        'tokens.token' : token,   //quotes are required when there is a dot between values. nice!
+        'tokens.access' : 'auth'
+    })
 }
 var User = mongoose.model('User',userSchema);
 module.exports = {
