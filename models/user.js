@@ -60,7 +60,7 @@ userSchema.methods.generateAuthToken = function(){
 }
 
 userSchema.statics.findByToken = function(token){
-    var User = this //capital  U because model method.
+    var User = this; //capital  U because model method.
     var decoded;  // why left undefined?this will store the return result from jwt.verify
     // we do this because jwt.verify will throw an error if something goes wrong.
     //we want to catch the error if that happens. 
@@ -82,6 +82,28 @@ userSchema.statics.findByToken = function(token){
         'tokens.access' : 'auth'
     })
 }
+userSchema.statics.findByCredentials = function(email, password){
+    var User = this;
+    return User.findOne({email}).then((user)=>{
+        if(!user){
+            return Promise.reject();
+        }
+        return new Promise((resolve, reject)=>{
+            bcrypt.compare(password, user.password, function(err, res){
+                if(err || !res){
+                    reject();
+                }
+                else{
+                    resolve(user);
+                }
+            })
+        })
+    })
+
+
+
+}
+
 userSchema.pre('save', function(next){
     var user = this;
     if(user.isModified('password')){

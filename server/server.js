@@ -2,6 +2,7 @@ const _ = require('lodash');
 var express= require('express');
 var app= express();
 var bodyParser= require('body-parser');
+var bcrypt    = require('bcryptjs');
 var {ObjectId} = require('mongodb');
 
 var {mongoose}= require('./db/mongoose.js');
@@ -158,6 +159,43 @@ app.post('/users', (req,res)=>{
   }).catch((e)=>{
     //console.log('amen3');
     res.status(400).send(e);
+  })
+});
+
+app.post('/users/login', (req, res)=>{
+  //console.log(req.body.email);
+  // User.findOne({
+  //   email : req.body.email
+  // }, function(err, user){
+  //     if(err){
+  //       console.log('oh oo');
+  //       res.status(400).send();
+  //     }
+  //     if(!user){
+  //       return res.send('No such user');
+        
+  //     }
+  //     bcrypt.compare(req.body.password,user.password,function(err, result){
+  //       if(err){
+  //         res.send(err);
+  //       }
+  //       //console.log(result);
+  //       if(result){
+  //         console.log(user);
+  //         res.send(user);
+  //       }else{
+  //         res.status(400).send();
+  //       }
+  //     })
+    
+  // })
+  var body = _.pick(req.body, ['email', 'password']);
+  User.findByCredentials(body.email, body.password).then((user)=>{
+    return user.generateAuthToken().then((token)=>{
+      res.header('x-auth', token).send(user);
+    })
+  }).catch((e)=>{
+    res.status(400).send();
   })
 })
 
